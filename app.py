@@ -26,7 +26,7 @@ bikes = [
 
 @app.route("/")
 def index():
-    # Public view: Only displays the comparison matrix. Admin tools and submission forms are hidden.
+    # Public view: Only displays the comparison matrix. Admin tools and forms are hidden.
     return render_template("index.html", bikes=bikes)
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -37,7 +37,6 @@ def admin_login():
     error = None
     if request.method == "POST":
         password = request.form.get("password")
-        # Secure password check via environment variable or default
         if password == os.environ.get("ADMIN_PASSWORD", "secret123"):
             session["is_admin"] = True
             return redirect(url_for("admin_dashboard"))
@@ -46,7 +45,7 @@ def admin_login():
 
 @app.route("/admin/dashboard", methods=["GET", "POST"])
 def admin_dashboard():
-    # Strict lock: If not logged in as admin, bounce straight to login page
+    # Strict barrier: If not logged in as admin, bounce straight to login page
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
     
