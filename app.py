@@ -6,32 +6,18 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 CSV_PATH = os.path.join('data', 'master_fleet_db.csv')
-ROOT_CSV_PATH = 'master_fleet_db.csv'
-
-ADMIN_IPS = ['127.0.0.1', '::1', 'YOUR_PUBLIC_IP_HERE']
 
 def load_db():
-    path = CSV_PATH if os.path.exists(CSV_PATH) else ROOT_CSV_PATH
-    if not os.path.exists(path):
-        return pd.DataFrame(columns=['Model', 'Category', 'Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Cooling', 'Tire_Spec', 'Waterproofing', 'Uphill_Climbing_Limit', 'Support_QC_Rating', 'Price', 'Manufacturer_URL'])
-    df = pd.read_csv(path)
-    for col in ['Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Price']:
+    if not os.path.exists(CSV_PATH):
+        return pd.DataFrame(columns=['Model', 'Category', 'Voltage', 'Peak_Watts', 'Battery_Wh', 'Range_Miles', 'Tire_Spec', 'Charge_Time', 'Waterproofing', 'Thermal_Management', 'Uphill_Climbing', 'Reliability_QC', 'Price', 'Manufacturer_URL'])
+    df = pd.read_csv(CSV_PATH)
+    for col in ['Voltage', 'Peak_Watts', 'Battery_Wh', 'Price']:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col].astype(str).str.replace('$', '').str.replace(',', ''), errors='coerce').fillna(0)
+            df.loc[:, col] = pd.to_numeric(df[col].astype(str).str.replace('$', '').str.replace(',', ''), errors='coerce').fillna(0)
     return df
 
 def save_db(df):
-    if os.path.exists('data'):
-        df.to_csv(CSV_PATH, index=False)
-    df.to_csv(ROOT_CSV_PATH, index=False)
-
-def is_admin():
-    if session.get('is_admin') == True:
-        return True
-    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if client_ip in ADMIN_IPS:
-        return True
-    return False
+    df.to_csv(CSV_PATH, index=False)
 
 @app.route('/')
 def index():
@@ -46,7 +32,7 @@ def index():
         bikes = df.to_dict(orient='records')
         return render_template('index.html', bikes=bikes, search_query=search_query)
     except Exception as e:
-        return f"Internal Application Error: {str(e)}", 500
+        return f"Internal Error: {str(e)}", 500
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -61,8 +47,9 @@ def admin_login():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
-    if not is_admin():
+    if not session.get('is_admin'):
         return redirect(url_for('admin_login'))
+    
     df = load_db()
     if request.method == 'POST':
         action = request.form.get('action')
@@ -72,13 +59,14 @@ def admin_dashboard():
                 'Category': request.form.get('Category', 'E-Bike'),
                 'Voltage': float(request.form.get('Voltage', 72)),
                 'Peak_Watts': float(request.form.get('Peak_Watts', 8000)),
-                'Torque_Nm': float(request.form.get('Torque_Nm', 300)),
                 'Battery_Wh': float(request.form.get('Battery_Wh', 3000)),
-                'Cooling': request.form.get('Cooling', 'Air/Standard'),
-                'Tire_Spec': request.form.get('Tire_Spec', 'Puncture-Resistant'),
-                'Waterproofing': request.form.get('Waterproofing', 'IP65'),
-                'Uphill_Climbing_Limit': request.form.get('Uphill_Climbing_Limit', 'Strong Climbing'),
-                'Support_QC_Rating': request.form.get('Support_QC_Rating', 'Good'),
+                'Range_Miles': request.form.get('Range_Miles', '40-60 mi'),
+                'Tire_Spec': request.form.get('Tire_Spec', 'Tubeless Puncture-Resistant'),
+                'Charge_Time': request.form.get('Charge_Time', '5 Hours'),
+                'Waterproofing': request.form.get('Waterproofing', 'IP65 Weather-Sealed'),
+                'Thermal_Management': request.form.get('Thermal_Management', 'Air/Standard'),
+                'Uphill_Climbing': request.form.get('Uphill_Climbing', 'Strong Climbing'),
+                'Reliability_QC': request.form.get('Reliability_QC', 'Good'),
                 'Price': float(request.form.get('Price', 2999)),
                 'Manufacturer_URL': request.form.get('Manufacturer_URL', '')
             }
@@ -90,8 +78,9 @@ def admin_dashboard():
             df = df[df['Model'] != model_name]
             save_db(df)
             return redirect(url_for('admin_dashboard'))
+            
     bikes = df.to_dict(orient='records')
-    return render_template('admin.html', bikes=bikes, client_ip=request.headers.get('X-Forwarded-For', request.remote_addr))
+    return render_template('admin.html', bikes=bikes, client_ip=request.remote_addr)
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -99,4 +88,4 @@ def admin_logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
