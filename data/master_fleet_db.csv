@@ -1,0 +1,7 @@
+id,brand,model,voltage,peak_watts,top_speed_mph,price,category,status,source_url
+1,Wired,Predator 72V,72,8000,55,3699,E-Bike,Active,https://www.wiredevbikes.com
+2,Inmotion,RS Midnight 2.0,72,8400,60,4599,Scooter,Active,https://inmotion-usa.com
+3,E-Ride Pro,Pro SS 2.0,72,6000,55,4899,E-Moto,Active,https://eridepros.com
+4,Sur-Ron,Ultra Bee,74,12500,55,6350,E-Moto,Active,https://surron.com
+5,Ariel Rider,Grizzly 52V/60V,60,3000,38,2999,E-Bike,Active,https://arielrider.com
+6,King Goat,Go Power Bikes,60,4000,45,2499,E-Bike,Active,https://gopowerbikes.com
