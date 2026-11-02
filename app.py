@@ -15,16 +15,12 @@ def load_db():
     if not os.path.exists(path):
         return pd.DataFrame(columns=['Model', 'Category', 'Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Cooling', 'Tire_Spec', 'Waterproofing', 'Uphill_Climbing_Limit', 'Support_QC_Rating', 'Price', 'Manufacturer_URL'])
     df = pd.read_csv(path)
-    # Clean numeric types
     for col in ['Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Price']:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col].astype(str).str.replace('$', '').str.replace(',', ''), errors='coerce').fillna(0)
     return df
 
 def save_db(df):
-    path = CSV_PATH if os.path.exists(CSV_PATH) else ROOT_CSV_PATH
-    df.to_csv(path, index=False)
-    # Sync both locations to be safe
     if os.path.exists('data'):
         df.to_csv(CSV_PATH, index=False)
     df.to_csv(ROOT_CSV_PATH, index=False)
@@ -42,22 +38,15 @@ def index():
     try:
         df = load_db()
         search_query = request.args.get('q', '').lower()
-        category_filter = request.args.get('cat', 'All')
-        
         if search_query:
             df = df[
                 df['Model'].astype(str).str.lower().str.contains(search_query, na=False) |
                 df['Category'].astype(str).str.lower().str.contains(search_query, na=False)
             ]
-            
-        if category_filter != 'All':
-            df = df[df['Category'] == category_filter]
-            
         bikes = df.to_dict(orient='records')
-        return render_template('index.html', bikes=bikes, search_query=search_query, category_filter=category_filter)
+        return render_template('index.html', bikes=bikes, search_query=search_query)
     except Exception as e:
-        print(f"Error: {e}")
-        return f"Internal Application Error: {e}", 500
+        return f"Internal Application Error: {str(e)}", 500
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -74,12 +63,9 @@ def admin_login():
 def admin_dashboard():
     if not is_admin():
         return redirect(url_for('admin_login'))
-        
     df = load_db()
-    
     if request.method == 'POST':
         action = request.form.get('action')
-        
         if action == 'add_bike':
             new_bike = {
                 'Model': request.form.get('Model', ''),
@@ -99,13 +85,11 @@ def admin_dashboard():
             df = pd.concat([df, pd.DataFrame([new_bike])], ignore_index=True)
             save_db(df)
             return redirect(url_for('admin_dashboard'))
-            
         elif action == 'delete_bike':
             model_name = request.form.get('model_name')
             df = df[df['Model'] != model_name]
             save_db(df)
             return redirect(url_for('admin_dashboard'))
-
     bikes = df.to_dict(orient='records')
     return render_template('admin.html', bikes=bikes, client_ip=request.headers.get('X-Forwarded-For', request.remote_addr))
 
@@ -115,4 +99,4 @@ def admin_logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
