@@ -6,24 +6,28 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 CSV_PATH = os.path.join('data', 'master_fleet_db.csv')
+ROOT_CSV_PATH = 'master_fleet_db.csv'
 
 ADMIN_IPS = ['127.0.0.1', '::1', 'YOUR_PUBLIC_IP_HERE']
 
 def load_db():
-    if not os.path.exists(CSV_PATH):
-        return pd.DataFrame(columns=['id', 'brand', 'model', 'voltage', 'peak_watts', 'top_speed_mph', 'price', 'category', 'status', 'source_url'])
-    df = pd.read_csv(CSV_PATH)
-    # Ensure default columns & clean types to prevent 500 errors
-    if 'status' not in df.columns:
-        df['status'] = 'Active'
-    df['price'] = pd.to_numeric(df['price'], errors='coerce').fillna(0)
-    df['voltage'] = pd.to_numeric(df['voltage'], errors='coerce').fillna(60)
-    df['peak_watts'] = pd.to_numeric(df['peak_watts'], errors='coerce').fillna(3000)
-    df['top_speed_mph'] = pd.to_numeric(df['top_speed_mph'], errors='coerce').fillna(40)
+    path = CSV_PATH if os.path.exists(CSV_PATH) else ROOT_CSV_PATH
+    if not os.path.exists(path):
+        return pd.DataFrame(columns=['Model', 'Category', 'Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Cooling', 'Tire_Spec', 'Waterproofing', 'Uphill_Climbing_Limit', 'Support_QC_Rating', 'Price', 'Manufacturer_URL'])
+    df = pd.read_csv(path)
+    # Clean numeric types
+    for col in ['Voltage', 'Peak_Watts', 'Torque_Nm', 'Battery_Wh', 'Price']:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col].astype(str).str.replace('$', '').str.replace(',', ''), errors='coerce').fillna(0)
     return df
 
 def save_db(df):
-    df.to_csv(CSV_PATH, index=False)
+    path = CSV_PATH if os.path.exists(CSV_PATH) else ROOT_CSV_PATH
+    df.to_csv(path, index=False)
+    # Sync both locations to be safe
+    if os.path.exists('data'):
+        df.to_csv(CSV_PATH, index=False)
+    df.to_csv(ROOT_CSV_PATH, index=False)
 
 def is_admin():
     if session.get('is_admin') == True:
@@ -37,25 +41,23 @@ def is_admin():
 def index():
     try:
         df = load_db()
-        public_df = df[df['status'] != 'Staging Review'] if 'status' in df.columns else df
-        
         search_query = request.args.get('q', '').lower()
         category_filter = request.args.get('cat', 'All')
         
         if search_query:
-            public_df = public_df[
-                public_df['brand'].astype(str).str.lower().str.contains(search_query, na=False) |
-                public_df['model'].astype(str).str.lower().str.contains(search_query, na=False)
+            df = df[
+                df['Model'].astype(str).str.lower().str.contains(search_query, na=False) |
+                df['Category'].astype(str).str.lower().str.contains(search_query, na=False)
             ]
             
         if category_filter != 'All':
-            public_df = public_df[public_df['category'] == category_filter]
+            df = df[df['Category'] == category_filter]
             
-        bikes = public_df.to_dict(orient='records')
+        bikes = df.to_dict(orient='records')
         return render_template('index.html', bikes=bikes, search_query=search_query, category_filter=category_filter)
     except Exception as e:
-        print(f"Error in index route: {e}")
-        return "Internal Application Error - Check Logs", 500
+        print(f"Error: {e}")
+        return f"Internal Application Error: {e}", 500
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -79,32 +81,28 @@ def admin_dashboard():
         action = request.form.get('action')
         
         if action == 'add_bike':
-            new_id = int(df['id'].max() + 1) if not df.empty and not pd.isna(df['id'].max()) else 1
             new_bike = {
-                'id': new_id,
-                'brand': request.form.get('brand', ''),
-                'model': request.form.get('model', ''),
-                'voltage': int(request.form.get('voltage', 60)),
-                'peak_watts': int(request.form.get('peak_watts', 3000)),
-                'top_speed_mph': int(request.form.get('top_speed_mph', 40)),
-                'price': float(request.form.get('price', 2500)),
-                'category': request.form.get('category', 'E-Bike'),
-                'status': 'Active',
-                'source_url': request.form.get('source_url', '')
+                'Model': request.form.get('Model', ''),
+                'Category': request.form.get('Category', 'E-Bike'),
+                'Voltage': float(request.form.get('Voltage', 72)),
+                'Peak_Watts': float(request.form.get('Peak_Watts', 8000)),
+                'Torque_Nm': float(request.form.get('Torque_Nm', 300)),
+                'Battery_Wh': float(request.form.get('Battery_Wh', 3000)),
+                'Cooling': request.form.get('Cooling', 'Air/Standard'),
+                'Tire_Spec': request.form.get('Tire_Spec', 'Puncture-Resistant'),
+                'Waterproofing': request.form.get('Waterproofing', 'IP65'),
+                'Uphill_Climbing_Limit': request.form.get('Uphill_Climbing_Limit', 'Strong Climbing'),
+                'Support_QC_Rating': request.form.get('Support_QC_Rating', 'Good'),
+                'Price': float(request.form.get('Price', 2999)),
+                'Manufacturer_URL': request.form.get('Manufacturer_URL', '')
             }
             df = pd.concat([df, pd.DataFrame([new_bike])], ignore_index=True)
             save_db(df)
             return redirect(url_for('admin_dashboard'))
             
-        elif action == 'approve_staging':
-            bike_id = int(request.form.get('bike_id'))
-            df.loc[df['id'] == bike_id, 'status'] = 'Active'
-            save_db(df)
-            return redirect(url_for('admin_dashboard'))
-            
         elif action == 'delete_bike':
-            bike_id = int(request.form.get('bike_id'))
-            df = df[df['id'] != bike_id]
+            model_name = request.form.get('model_name')
+            df = df[df['Model'] != model_name]
             save_db(df)
             return redirect(url_for('admin_dashboard'))
 

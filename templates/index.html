@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Best 60V+ Electric Bikes & E-Motos | Ultimate Comparison Matrix</title>
+    <title>Most Powerful E-Bikes and E-Motos Over 60 Volts | Best60VoltEbike.com</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -12,18 +12,12 @@
             <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-black tracking-wider text-cyan-400 uppercase">⚡ Best60VoltEbike.com</h1>
-                    <p class="text-xs text-slate-400">High-Voltage E-Bikes, Scooters & E-Motos Matrix</p>
+                    <p class="text-xs text-slate-400">Best 60 Volt E-Bike : The Ultimate High-Voltage Performance Matrix</p>
                 </div>
                 <form method="GET" action="/" class="flex items-center gap-2 w-full md:w-auto">
-                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search brand or model..." 
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search model or category..." 
                            class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500 w-full md:w-64">
-                    <select name="cat" class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500">
-                        <option value="All" {% if category_filter == 'All' %}selected{% endif %}>All Categories</option>
-                        <option value="E-Bike" {% if category_filter == 'E-Bike' %}selected{% endif %}>E-Bikes</option>
-                        <option value="Scooter" {% if category_filter == 'Scooter' %}selected{% endif %}>Scooters</option>
-                        <option value="E-Moto" {% if category_filter == 'E-Moto' %}selected{% endif %}>E-Motos</option>
-                    </select>
-                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">Filter</button>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">Search</button>
                 </form>
             </div>
         </header>
@@ -31,42 +25,49 @@
         <main class="max-w-7xl mx-auto px-4 py-8">
             <div class="mb-6 flex justify-between items-end">
                 <div>
-                    <h2 class="text-xl font-bold text-white">Verified High-Voltage Fleet</h2>
-                    <p class="text-sm text-slate-400">Explore top-tier 60V, 72V, and performance electric rides.</p>
+                    <h2 class="text-xl font-bold text-white">Most Powerful E-Bikes and E-Motos Over 60 Volts</h2>
+                    <p class="text-sm text-slate-400">Complete technical comparison matrix across your 14 fleet vehicles.</p>
                 </div>
-                <a href="/admin" class="text-xs text-slate-500 hover:text-cyan-400 transition">Admin Portal Access</a>
+                <a href="/admin" class="text-xs text-slate-500 hover:text-cyan-400 transition">🔒 Admin Portal</a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for bike in bikes %}
-                {% if bike.status == 'Active' %}
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/50 transition shadow-xl flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-3">
-                            <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20">{{ bike.category }}</span>
-                            <span class="text-lg font-black text-emerald-400">${{ bike.price }}</span>
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20">{{ bike.Category }}</span>
+                            <span class="text-lg font-black text-emerald-400">${{ bike.Price }}</span>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-1">{{ bike.brand }} {{ bike.model }}</h3>
-                        <div class="grid grid-cols-3 gap-2 my-4 text-center bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+                        <h3 class="text-lg font-bold text-white mb-3">{{ bike.Model }}</h3>
+                        <div class="grid grid-cols-2 gap-2 my-2 text-center bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 text-xs">
                             <div>
                                 <span class="block text-[10px] text-slate-400 uppercase">Voltage</span>
-                                <span class="text-sm font-bold text-cyan-300">{{ bike.voltage }}V</span>
+                                <span class="font-bold text-cyan-300">{{ bike.Voltage }}V</span>
                             </div>
                             <div>
                                 <span class="block text-[10px] text-slate-400 uppercase">Peak Power</span>
-                                <span class="text-sm font-bold text-amber-300">{{ bike.peak_watts }}W</span>
+                                <span class="font-bold text-amber-300">{{ bike.Peak_Watts }}W</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] text-slate-400 uppercase">Top Speed</span>
-                                <span class="text-sm font-bold text-rose-300">{{ bike.top_speed_mph }} MPH</span>
+                                <span class="block text-[10px] text-slate-400 uppercase">Torque</span>
+                                <span class="font-bold text-emerald-300">{{ bike.Torque_Nm }} Nm</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] text-slate-400 uppercase">Battery</span>
+                                <span class="font-bold text-purple-300">{{ bike.Battery_Wh }} Wh</span>
                             </div>
                         </div>
+                        <div class="text-[11px] text-slate-300 space-y-1 mt-3">
+                            <p><strong>Cooling:</strong> {{ bike.Cooling }}</p>
+                            <p><strong>Tires:</strong> {{ bike.Tire_Spec }}</p>
+                            <p><strong>Climbing:</strong> {{ bike.Uphill_Climbing_Limit }}</p>
+                        </div>
                     </div>
-                    {% if bike.source_url and bike.source_url != 'nan' %}
-                    <a href="{{ bike.source_url }}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-lg transition">View Official Specs ↗</a>
+                    {% if bike.Manufacturer_URL and bike.Manufacturer_URL != 'nan' %}
+                    <a href="{{ bike.Manufacturer_URL }}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-lg transition mt-4">View Manufacturer ↗</a>
                     {% endif %}
                 </div>
-                {% endif %}
                 {% endfor %}
             </div>
         </main>
