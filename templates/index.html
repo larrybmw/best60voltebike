@@ -2,33 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Best 60V+ E-Bike & E-Moto Comparison Matrix</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px; }
-        .container { max-width: 1000px; margin: auto; }
-        h1 { color: #38bdf8; font-size: 1.8rem; }
-        p { color: #94a3b8; }
-        .bike-card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
-        .bike-card h3 { margin-top: 0; color: #f8fafc; }
-        .admin-link { margin-top: 40px; display: inline-block; color: #64748b; text-decoration: none; font-size: 0.85rem; }
-        .admin-link:hover { color: #38bdf8; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best 60V+ Electric Bikes & E-Motos | Ultimate Comparison Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Most Powerful E-Bikes and E-Motos Over 60 Volts</h1>
-        <p>Best 60 Volt E-Bike : The Ultimate High-Voltage Performance Matrix</p>
-        
-        <div class="bike-list" style="margin-top: 30px;">
-            {% for bike in bikes %}
-            <div class="bike-card">
-                <h3>{{ bike.name }}</h3>
-                <p><strong>Voltage:</strong> {{ bike.voltage }} | <strong>Power:</strong> {{ bike.power }} | <strong>Speed:</strong> {{ bike.speed }} | <strong>Price:</strong> {{ bike.price }}</p>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+    <div>
+        <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-black tracking-wider text-cyan-400 uppercase">⚡ Best60VoltEbike.com</h1>
+                    <p class="text-xs text-slate-400">High-Voltage E-Bikes, Scooters & E-Motos Matrix</p>
+                </div>
+                <form method="GET" action="/" class="flex items-center gap-2 w-full md:w-auto">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search brand or model..." 
+                           class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500 w-full md:w-64">
+                    <select name="cat" class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500">
+                        <option value="All" {% if category_filter == 'All' %}selected{% endif %}>All Categories</option>
+                        <option value="E-Bike" {% if category_filter == 'E-Bike' %}selected{% endif %}>E-Bikes</option>
+                        <option value="Scooter" {% if category_filter == 'Scooter' %}selected{% endif %}>Scooters</option>
+                        <option value="E-Moto" {% if category_filter == 'E-Moto' %}selected{% endif %}>E-Motos</option>
+                    </select>
+                    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">Filter</button>
+                </form>
             </div>
-            {% endfor %}
-        </div>
-        
-        <a href="/admin/login" class="admin-link">🔒 Admin Portal</a>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <div class="mb-6 flex justify-between items-end">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Verified High-Voltage Fleet</h2>
+                    <p class="text-sm text-slate-400">Explore top-tier 60V, 72V, and performance electric rides.</p>
+                </div>
+                <a href="/admin" class="text-xs text-slate-500 hover:text-cyan-400 transition">Admin Portal Access</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for bike in bikes %}
+                {% if bike.status == 'Active' %}
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/50 transition shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20">{{ bike.category }}</span>
+                            <span class="text-lg font-black text-emerald-400">${{ "{:,.0f}".format(bike.price) }}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">{{ bike.brand }} {{ bike.model }}</h3>
+                        <div class="grid grid-cols-3 gap-2 my-4 text-center bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+                            <div>
+                                <span class="block text-[10px] text-slate-400 uppercase">Voltage</span>
+                                <span class="text-sm font-bold text-cyan-300">{{ bike.voltage }}V</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] text-slate-400 uppercase">Peak Power</span>
+                                <span class="text-sm font-bold text-amber-300">{{ bike.peak_watts }}W</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] text-slate-400 uppercase">Top Speed</span>
+                                <span class="text-sm font-bold text-rose-300">{{ bike.top_speed_mph }} MPH</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if bike.source_url %}
+                    <a href="{{ bike.source_url }}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-lg transition">View Official Specs ↗</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </main>
     </div>
+
+    <footer class="border-t border-slate-800 bg-slate-900/40 py-6 text-center text-xs text-slate-400">
+        <p>&copy; 2026 Best60VoltEbike.com. All rights reserved. | Updated: November 2026</p>
+    </footer>
 </body>
 </html>

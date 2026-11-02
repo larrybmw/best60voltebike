@@ -1,79 +1,108 @@
 import os
+import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "best60voltebike-super-secure-production-key")
+app.secret_key = os.urandom(24)
 
-# In-memory store for bikes
-bikes = [
-    {
-        "id": 1,
-        "name": "Wired Predator 72V",
-        "voltage": "72V",
-        "power": "8,000W Peak",
-        "speed": "55+ mph",
-        "price": "$3,699"
-    },
-    {
-        "id": 2,
-        "name": "Inmotion RS Midnight 2.0",
-        "voltage": "72V",
-        "power": "8,400W Peak",
-        "speed": "60+ mph",
-        "price": "$4,599"
-    }
-]
+CSV_PATH = os.path.join('data', 'master_fleet_db.csv')
 
-@app.route("/")
+ADMIN_IPS = ['127.0.0.1', '::1', 'YOUR_PUBLIC_IP_HERE']
+
+def load_db():
+    if not os.path.exists(CSV_PATH):
+        return pd.DataFrame(columns=['id', 'brand', 'model', 'voltage', 'peak_watts', 'top_speed_mph', 'price', 'category', 'status', 'source_url'])
+    return pd.read_csv(CSV_PATH)
+
+def save_db(df):
+    df.to_csv(CSV_PATH, index=False)
+
+def is_admin():
+    if session.get('is_admin') == True:
+        return True
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if client_ip in ADMIN_IPS:
+        return True
+    return False
+
+@app.route('/')
 def index():
-    # Public view: Only displays the comparison matrix. Admin tools and forms are hidden.
-    return render_template("index.html", bikes=bikes)
-
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    if session.get("is_admin"):
-        return redirect(url_for("admin_dashboard"))
-        
-    error = None
-    if request.method == "POST":
-        password = request.form.get("password")
-        if password == os.environ.get("ADMIN_PASSWORD", "secret123"):
-            session["is_admin"] = True
-            return redirect(url_for("admin_dashboard"))
-        error = "Invalid password. Access denied."
-    return render_template("admin_login.html", error=error)
-
-@app.route("/admin/dashboard", methods=["GET", "POST"])
-def admin_dashboard():
-    # Strict barrier: If not logged in as admin, bounce straight to login page
-    if not session.get("is_admin"):
-        return redirect(url_for("admin_login"))
+    df = load_db()
+    public_df = df[df['status'] != 'Staging Review'] if 'status' in df.columns else df
     
-    if request.method == "POST":
-        name = request.form.get("name")
-        voltage = request.form.get("voltage")
-        power = request.form.get("power")
-        speed = request.form.get("speed")
-        price = request.form.get("price")
+    search_query = request.args.get('q', '').lower()
+    category_filter = request.args.get('cat', 'All')
+    
+    if search_query:
+        public_df = public_df[
+            public_df['brand'].str.lower().str.contains(search_query, na=False) |
+            public_df['model'].str.lower().str.contains(search_query, na=False)
+        ]
         
-        if name and voltage:
+    if category_filter != 'All':
+        public_df = public_df[public_df['category'] == category_filter]
+        
+    bikes = public_df.to_dict(orient='records')
+    return render_template('index.html', bikes=bikes, search_query=search_query, category_filter=category_filter)
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        passcode = request.form.get('passcode')
+        if passcode == 'Best60VAdmin2026!':
+            session['is_admin'] = True
+            return redirect(url_for('admin_dashboard'))
+        else:
+            return render_template('admin_login.html', error='Invalid Master Passcode')
+    return render_template('admin_login.html')
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_dashboard():
+    if not is_admin():
+        return redirect(url_for('admin_login'))
+        
+    df = load_db()
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'add_bike':
+            new_id = int(df['id'].max() + 1) if not df.empty else 1
             new_bike = {
-                "id": len(bikes) + 1,
-                "name": name,
-                "voltage": voltage,
-                "power": power,
-                "speed": speed,
-                "price": price
+                'id': new_id,
+                'brand': request.form.get('brand'),
+                'model': request.form.get('model'),
+                'voltage': int(request.form.get('voltage', 60)),
+                'peak_watts': int(request.form.get('peak_watts', 3000)),
+                'top_speed_mph': int(request.form.get('top_speed_mph', 40)),
+                'price': float(request.form.get('price', 2500)),
+                'category': request.form.get('category', 'E-Bike'),
+                'status': 'Active',
+                'source_url': request.form.get('source_url', '')
             }
-            bikes.append(new_bike)
-        return redirect(url_for("admin_dashboard"))
-        
-    return render_template("admin_dashboard.html", bikes=bikes)
+            df = pd.concat([df, pd.DataFrame([new_bike])], ignore_index=True)
+            save_db(df)
+            return redirect(url_for('admin_dashboard'))
+            
+        elif action == 'approve_staging':
+            bike_id = int(request.form.get('bike_id'))
+            df.loc[df['id'] == bike_id, 'status'] = 'Active'
+            save_db(df)
+            return redirect(url_for('admin_dashboard'))
+            
+        elif action == 'delete_bike':
+            bike_id = int(request.form.get('bike_id'))
+            df = df[df['id'] != bike_id]
+            save_db(df)
+            return redirect(url_for('admin_dashboard'))
 
-@app.route("/admin/logout")
+    bikes = df.to_dict(orient='records')
+    return render_template('admin.html', bikes=bikes, client_ip=request.headers.get('X-Forwarded-For', request.remote_addr))
+
+@app.route('/admin/logout')
 def admin_logout():
-    session.pop("is_admin", None)
-    return redirect(url_for("index"))
+    session.pop('is_admin', None)
+    return redirect(url_for('index'))
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

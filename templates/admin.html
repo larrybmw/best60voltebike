@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Best60VoltEbike.com</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased p-6">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-2xl font-black text-cyan-400">⚡ Master Admin Control Center</h1>
+                <p class="text-xs text-slate-400">Authenticated Host IP: <span class="text-emerald-400 font-mono">{{ client_ip }}</span></p>
+            </div>
+            <div class="flex gap-3">
+                <a href="/" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-4 py-2 rounded-lg transition">View Live Site</a>
+                <a href="/admin/logout" class="bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 text-xs font-bold px-4 py-2 rounded-lg transition">Logout</a>
+            </div>
+        </header>
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl mb-8 shadow-2xl">
+            <h2 class="text-lg font-bold text-white mb-4">Add New High-Voltage Machine</h2>
+            <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="hidden" name="action" value="add_bike">
+                <input type="text" name="brand" placeholder="Brand (e.g. Sur-Ron)" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <input type="text" name="model" placeholder="Model (e.g. Storm Bee)" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <input type="number" name="voltage" placeholder="Voltage (e.g. 72)" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <input type="number" name="peak_watts" placeholder="Peak Watts (e.g. 8000)" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <input type="number" name="top_speed_mph" placeholder="Top Speed MPH" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <input type="number" step="0.01" name="price" placeholder="Price ($)" required class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <select name="category" class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                    <option value="E-Bike">E-Bike</option>
+                    <option value="Scooter">Scooter</option>
+                    <option value="E-Moto">E-Moto</option>
+                </select>
+                <input type="text" name="source_url" placeholder="Source URL / Link" class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white">
+                <button type="submit" class="md:col-span-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-lg transition">Publish to Fleet Database</button>
+            </form>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold text-white">Fleet Database & Staging Inbox</h3>
+                <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-300">Total Records: {{ bikes|length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-950 text-slate-400 text-xs uppercase border-b border-slate-800">
+                        <tr>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Brand / Model</th>
+                            <th class="p-3">Specs</th>
+                            <th class="p-3">Price</th>
+                            <th class="p-3">Category</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        {% for bike in bikes %}
+                        <tr class="hover:bg-slate-800/40 transition">
+                            <td class="p-3">
+                                {% if bike.status == 'Active' %}
+                                <span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs rounded-full border border-emerald-500/20">Active</span>
+                                {% else %}
+                                <span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 text-xs rounded-full border border-amber-500/20">Staging</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 font-bold text-white">{{ bike.brand }} {{ bike.model }}</td>
+                            <td class="p-3 text-xs text-slate-300">{{ bike.voltage }}V | {{ bike.peak_watts }}W | {{ bike.top_speed_mph }} MPH</td>
+                            <td class="p-3 text-emerald-400 font-bold">${{ "{:,.0f}".format(bike.price) }}</td>
+                            <td class="p-3 text-cyan-400 text-xs">{{ bike.category }}</td>
+                            <td class="p-3 text-right flex justify-end gap-2">
+                                {% if bike.status != 'Active' %}
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="approve_staging">
+                                    <input type="hidden" name="bike_id" value="{{ bike.id }}">
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded text-xs font-semibold">Approve</button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" onsubmit="return confirm('Delete this record?');">
+                                    <input type="hidden" name="action" value="delete_bike">
+                                    <input type="hidden" name="bike_id" value="{{ bike.id }}">
+                                    <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1 rounded text-xs font-semibold">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

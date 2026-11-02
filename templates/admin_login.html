@@ -2,24 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Login</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: #1e293b; padding: 30px; border-radius: 8px; width: 300px; border: 1px solid #334155; }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0ea5e9; }
-        .error { color: #f87171; font-size: 0.9em; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Best60VoltEbike.com</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        <form method="POST">
-            <input type="password" name="password" placeholder="Enter Admin Password" required>
-            <button type="submit">Log In</button>
+<body class="bg-slate-950 text-slate-100 flex items-center justify-center min-h-screen">
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-2xl">
+        <h1 class="text-xl font-black text-cyan-400 mb-2">Restricted Admin Access</h1>
+        <p class="text-xs text-slate-400 mb-6">Enter master passcode or authenticate via host IP.</p>
+        
+        {% if error %}
+        <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs p-3 rounded-lg mb-4">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs uppercase text-slate-400 mb-1">Master Passcode</label>
+                <input type="password" name="passcode" required class="w-full bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-cyan-500">
+            </div>
+            <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-lg transition">Authenticate Admin</button>
         </form>
+        <div class="mt-6 text-center">
+            <a href="/" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Return to Public Matrix</a>
+        </div>
     </div>
 </body>
 </html>
