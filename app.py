@@ -1,65 +1,80 @@
-from flask import Flask, render_template, request, redirect, url_for
-import csv
 import os
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "best60voltebike-super-secure-production-key")
 
-FIELDNAMES = [
-    'Model', 'Category', 'Voltage', 'Peak_Watts', 'Torque_Nm', 
-    'Battery_Wh', 'Cooling', 'Tire_Spec', 'Waterproofing', 
-    'Uphill_Climbing_Limit', 'Support_QC_Rating', 'Price', 'Manufacturer_URL'
+# In-memory store for bikes
+bikes = [
+    {
+        "id": 1,
+        "name": "Wired Predator 72V",
+        "voltage": "72V",
+        "power": "8,000W Peak",
+        "speed": "55+ mph",
+        "price": "$3,699"
+    },
+    {
+        "id": 2,
+        "name": "Inmotion RS Midnight 2.0",
+        "voltage": "72V",
+        "power": "8,400W Peak",
+        "speed": "60+ mph",
+        "price": "$4,599"
+    }
 ]
 
-def load_csv(filename):
-    data = []
-    if os.path.exists(filename):
-        with open(filename, mode='r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                data.append(row)
-    return data
+@app.route("/")
+def index():
+    # Public view: Only displays the comparison matrix. Admin tools and submission forms are hidden.
+    return render_template("index.html", bikes=bikes)
 
-@app.route('/')
-def home():
-    fleet = load_csv('master_fleet_db.csv')
-    inbox = load_csv('staging_inbox.csv')
-    return render_template('index.html', fleet=fleet, inbox=inbox)
-
-@app.route('/add', methods=['POST'])
-def add_bike():
-    new_bike = {field: request.form.get(field) for field in FIELDNAMES}
-    with open('master_fleet_db.csv', mode='a', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
-        writer.writerow(new_bike)
-    return redirect(url_for('home'))
-
-@app.route('/approve/<int:index>', methods=['POST'])
-def approve_bike(index):
-    inbox = load_csv('staging_inbox.csv')
-    if 0 <= index < len(inbox):
-        approved = inbox.pop(index)
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if session.get("is_admin"):
+        return redirect(url_for("admin_dashboard"))
         
-        with open('master_fleet_db.csv', mode='a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
-            writer.writerow(approved)
-            
-        with open('staging_inbox.csv', mode='w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
-            writer.writeheader()
-            writer.writerows(inbox)
-            
-    return redirect(url_for('home'))
+    error = None
+    if request.method == "POST":
+        password = request.form.get("password")
+        # Secure password check via environment variable or default
+        if password == os.environ.get("ADMIN_PASSWORD", "secret123"):
+            session["is_admin"] = True
+            return redirect(url_for("admin_dashboard"))
+        error = "Invalid password. Access denied."
+    return render_template("admin_login.html", error=error)
 
-@app.route('/discard/<int:index>', methods=['POST'])
-def discard_bike(index):
-    inbox = load_csv('staging_inbox.csv')
-    if 0 <= index < len(inbox):
-        inbox.pop(index)
-        with open('staging_inbox.csv', mode='w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
-            writer.writeheader()
-            writer.writerows(inbox)
-    return redirect(url_for('home'))
+@app.route("/admin/dashboard", methods=["GET", "POST"])
+def admin_dashboard():
+    # Strict lock: If not logged in as admin, bounce straight to login page
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login"))
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        voltage = request.form.get("voltage")
+        power = request.form.get("power")
+        speed = request.form.get("speed")
+        price = request.form.get("price")
+        
+        if name and voltage:
+            new_bike = {
+                "id": len(bikes) + 1,
+                "name": name,
+                "voltage": voltage,
+                "power": power,
+                "speed": speed,
+                "price": price
+            }
+            bikes.append(new_bike)
+        return redirect(url_for("admin_dashboard"))
+        
+    return render_template("admin_dashboard.html", bikes=bikes)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("is_admin", None)
+    return redirect(url_for("index"))
+
+if __name__ == "__main__":
+    app.run(debug=True)
