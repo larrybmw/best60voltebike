@@ -44,7 +44,7 @@
                     <div>
                         <div class="flex justify-between items-start mb-3">
                             <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20">{{ bike.category }}</span>
-                            <span class="text-lg font-black text-emerald-400">${{ "{:,.0f}".format(bike.price) }}</span>
+                            <span class="text-lg font-black text-emerald-400">${{ bike.price }}</span>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-1">{{ bike.brand }} {{ bike.model }}</h3>
                         <div class="grid grid-cols-3 gap-2 my-4 text-center bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     </div>
-                    {% if bike.source_url %}
+                    {% if bike.source_url and bike.source_url != 'nan' %}
                     <a href="{{ bike.source_url }}" target="_blank" class="block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-lg transition">View Official Specs ↗</a>
                     {% endif %}
                 </div>

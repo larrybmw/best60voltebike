@@ -12,7 +12,15 @@ ADMIN_IPS = ['127.0.0.1', '::1', 'YOUR_PUBLIC_IP_HERE']
 def load_db():
     if not os.path.exists(CSV_PATH):
         return pd.DataFrame(columns=['id', 'brand', 'model', 'voltage', 'peak_watts', 'top_speed_mph', 'price', 'category', 'status', 'source_url'])
-    return pd.read_csv(CSV_PATH)
+    df = pd.read_csv(CSV_PATH)
+    # Ensure default columns & clean types to prevent 500 errors
+    if 'status' not in df.columns:
+        df['status'] = 'Active'
+    df['price'] = pd.to_numeric(df['price'], errors='coerce').fillna(0)
+    df['voltage'] = pd.to_numeric(df['voltage'], errors='coerce').fillna(60)
+    df['peak_watts'] = pd.to_numeric(df['peak_watts'], errors='coerce').fillna(3000)
+    df['top_speed_mph'] = pd.to_numeric(df['top_speed_mph'], errors='coerce').fillna(40)
+    return df
 
 def save_db(df):
     df.to_csv(CSV_PATH, index=False)
@@ -27,23 +35,27 @@ def is_admin():
 
 @app.route('/')
 def index():
-    df = load_db()
-    public_df = df[df['status'] != 'Staging Review'] if 'status' in df.columns else df
-    
-    search_query = request.args.get('q', '').lower()
-    category_filter = request.args.get('cat', 'All')
-    
-    if search_query:
-        public_df = public_df[
-            public_df['brand'].str.lower().str.contains(search_query, na=False) |
-            public_df['model'].str.lower().str.contains(search_query, na=False)
-        ]
+    try:
+        df = load_db()
+        public_df = df[df['status'] != 'Staging Review'] if 'status' in df.columns else df
         
-    if category_filter != 'All':
-        public_df = public_df[public_df['category'] == category_filter]
+        search_query = request.args.get('q', '').lower()
+        category_filter = request.args.get('cat', 'All')
         
-    bikes = public_df.to_dict(orient='records')
-    return render_template('index.html', bikes=bikes, search_query=search_query, category_filter=category_filter)
+        if search_query:
+            public_df = public_df[
+                public_df['brand'].astype(str).str.lower().str.contains(search_query, na=False) |
+                public_df['model'].astype(str).str.lower().str.contains(search_query, na=False)
+            ]
+            
+        if category_filter != 'All':
+            public_df = public_df[public_df['category'] == category_filter]
+            
+        bikes = public_df.to_dict(orient='records')
+        return render_template('index.html', bikes=bikes, search_query=search_query, category_filter=category_filter)
+    except Exception as e:
+        print(f"Error in index route: {e}")
+        return "Internal Application Error - Check Logs", 500
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -67,11 +79,11 @@ def admin_dashboard():
         action = request.form.get('action')
         
         if action == 'add_bike':
-            new_id = int(df['id'].max() + 1) if not df.empty else 1
+            new_id = int(df['id'].max() + 1) if not df.empty and not pd.isna(df['id'].max()) else 1
             new_bike = {
                 'id': new_id,
-                'brand': request.form.get('brand'),
-                'model': request.form.get('model'),
+                'brand': request.form.get('brand', ''),
+                'model': request.form.get('model', ''),
                 'voltage': int(request.form.get('voltage', 60)),
                 'peak_watts': int(request.form.get('peak_watts', 3000)),
                 'top_speed_mph': int(request.form.get('top_speed_mph', 40)),
