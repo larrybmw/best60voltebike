@@ -1,0 +1,15 @@
+Model,Category,Voltage,Peak_Watts,Torque_Nm,Battery_Wh,Cooling,Tire_Spec,Waterproofing,Uphill_Climbing_Limit,Support_QC_Rating,Price,Manufacturer_URL
+Wired Predator 72V,Dual Hub E-Bike,72,8000,330,2520,Air/Standard,Puncture-Resistant 26",IPX5 Splash-Proof,Great High-Speed Climbing,Good Consumer Feedback,3499,https://wiredebikes.com
+Wired Viper 72V,Dual Hub E-Bike,72,8000,330,2520,Air/Standard,CoolRide Hybrid Fat Tire 20",IPX5 Splash-Proof,Aggressive Acceleration Climbing,Good Consumer Feedback,3599,https://wiredebikes.com
+Magician Alpha 72V,Rear Hub E-Bike,72,5000,180,3240,Air-Cooled,Innova Puncture-Resistant,IP65 Weather-Sealed,Exceptional Sustained Torque Climbing,Good Support Network,3199,https://www.google.com
+Magician Alpha Mini 72V,Rear Hub E-Bike,72,5000,180,2160,Air-Cooled,Innova Puncture-Resistant,IP65 Weather-Sealed,Sturdy Compact Hill Performance,Good Support Network,2799,https://www.google.com
+Ariel Rider Grizzly 72V,Dual Hub E-Bike,72,8000,250,3240,Oil-Cooled Hub,Heavy-Duty Fat Tire (Tube/Liner Recommended),IP65 Water-Resistant,Strong Uphill (Hub Thermal Watch on Crawls),US-Based Excellent Support,2799,https://arielrider.com
+Ariel Rider MUDD 72V,Mid-Drive E-Moto,72,8000,330,2800,Oil-Cooled/Air,Off-Road Moto Tires,IP65 Water-Resistant,Extreme Steep Trail Crawler,US-Based Excellent Support,3299,https://arielrider.com
+Onyx RCR 80V,Moped-Style E-Moto,80,12000,200,4320,Statorade/Air,Moto-Grade 17" Tires,IP54 Splash-Proof,Monster Mid-Range Torque,Mod-Friendly / Direct Support,5499,https://onyxmotorbikes.com
+Onyx RCR 72V,Moped-Style E-Moto,72,8000,160,2880,Statorade/Air,Moto-Grade 17" Tires,IP54 Splash-Proof,Strong Urban/Trail Hill Power,Mod-Friendly / Direct Support,4599,https://onyxmotorbikes.com
+King Goat V3,Mid-Drive E-Moto,72,12500,400,4500,Air/Heatsink,Tubeless Puncture-Resistant w/ Sealant,IP65 Weather-Sealed,Extreme Steep Fire Trails (Low-End Torque King),Good (Upgraded Harnesses),3800,https://www.google.com
+King Goat Power Goat MD,Mid-Drive E-Moto,72,12000,380,4500,Air/Heatsink,Innova Self-Sealing Tubeless,IP65 Weather-Sealed,Extreme Hill Climbing (Regen Equipped),Good Support Network,3999,https://www.google.com
+Aniioki A8 Pro Max,Long-Range Dual Hub,60,6000,250,4800,Air-Cooled,Puncture Protection Fat Tires 20",IPX6 Weather-Sealed,Strong Long-Distance Hill Grade (45° max),Good Direct Support Network,2999,https://aniioki.com
+Aniioki A9 Pro Max,Heavy-Duty Long-Range,60,7000,250,4800,Air-Cooled,Puncture Protection Fat Tires 26",IPX6 Weather-Sealed,Heavy-Duty Gradeability (50° max),Good Direct Support Network,3299,https://aniioki.com
+Juiced Nomadix,Heavy-Duty E-Moto,72,15000,300,2160,Air-Cooled,Off-Road Fat Tires,IP65 Weather-Sealed,Massive Power Climbing,US Brand Support,2799,https://juicedbikes.com
+Solar E-Clipse 2.0,Performance E-Moto,72,12000,280,3240,Air-Cooled,Enduro Tires 19",IP65 Weather-Sealed,High-Speed Trail Climbing,Direct Performance Support,5695,https://solarscooters.com

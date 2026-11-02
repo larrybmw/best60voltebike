@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Most Powerful E-Bikes and E-Motos Over 60 Volts | Best 60 Volt E-Bike</title>
+    <style>
+        :root {
+            --bg-deep: #090d16;
+            --bg-surface: #111827;
+            --bg-card: #1f2937;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-amber: #f59e0b;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px 20px 20px;
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-deep) 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            margin: 0;
+        }
+
+        .controls-bar {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 16px 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 1.05rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+        }
+
+        .admin-box {
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+        }
+
+        .admin-box h3 {
+            margin-top: 0;
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+        }
+
+        .admin-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .admin-form input, .admin-form button {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-deep);
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .admin-form input:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+
+        .admin-form button {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .admin-form button:hover {
+            opacity: 0.9;
+        }
+
+        .inbox-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px dashed var(--accent-amber);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+        }
+
+        .inbox-section h3 {
+            color: var(--accent-amber);
+            margin-top: 0;
+        }
+
+        .inbox-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .inbox-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve {
+            background: var(--accent-green);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-discard {
+            background: #ef4444;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .table-container {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow-x: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--accent-blue);
+            padding: 18px 20px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+            font-size: 0.95rem;
+            color: #e5e7eb;
+        }
+
+        tr:hover {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        .model-link {
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 1.05rem;
+            transition: color 0.2s;
+        }
+
+        .model-link:hover {
+            color: #7dd3fc;
+            text-decoration: underline;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-blue);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .price-tag {
+            color: var(--accent-green);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .spec-sub {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        footer span {
+            color: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Most Powerful E-Bikes and E-Motos Over 60 Volts</h1>
+            <p class="subtitle">Best 60 Volt E-Bike : The Ultimate High-Voltage Performance Matrix</p>
+        </header>
+        
+        <div class="controls-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search any model, battery capacity, tire spec, or feature..." onkeyup="filterTable()">
+        </div>
+
+        {% if inbox %}
+        <div class="inbox-section">
+            <h3>📥 Discovered Staging Inbox (Pending Review)</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0;">Review automated discoveries below and click approve to publish them directly to your live comparison matrix.</p>
+            {% for item in inbox %}
+            <div class="inbox-item">
+                <div>
+                    <strong>{{ item['Model'] }}</strong> 
+                    <span style="color: var(--accent-cyan); margin-left: 10px;">{{ item['Voltage'] }}V | {{ item['Peak_Watts'] }}W</span>
+                    <span style="color: var(--text-muted); margin-left: 10px;">${{ item['Price'] }}</span>
+                </div>
+                <div class="inbox-actions">
+                    <form action="/approve/{{ loop.index0 }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-approve">Approve & Publish</button>
+                    </form>
+                    <form action="/discard/{{ loop.index0 }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-discard">Discard</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="admin-box">
+            <h3>⚡ Quick-Add Machine to Matrix</h3>
+            <form action="/add" method="POST" class="admin-form">
+                <input type="text" name="Model" placeholder="Model Name" required>
+                <input type="text" name="Category" placeholder="Category" required>
+                <input type="text" name="Voltage" placeholder="Voltage (e.g. 72)" required>
+                <input type="text" name="Peak_Watts" placeholder="Peak Watts" required>
+                <input type="text" name="Torque_Nm" placeholder="Torque Nm" required>
+                <input type="text" name="Battery_Wh" placeholder="Battery Wh" required>
+                <input type="text" name="Cooling" placeholder="Cooling System" required>
+                <input type="text" name="Tire_Spec" placeholder="Tire Specs" required>
+                <input type="text" name="Waterproofing" placeholder="Waterproofing IP" required>
+                <input type="text" name="Uphill_Climbing_Limit" placeholder="Uphill Profile" required>
+                <input type="text" name="Support_QC_Rating" placeholder="Support Rating" required>
+                <input type="text" name="Price" placeholder="Price $" required>
+                <input type="text" name="Manufacturer_URL" placeholder="Manufacturer URL (https://...)" required>
+                <button type="submit">Inject Machine Into Live Matrix</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table id="comparisonTable">
+                <thead>
+                    <tr>
+                        <th>Machine Model</th>
+                        <th>Class / Architecture</th>
+                        <th>System Voltage / Peak</th>
+                        <th>Torque & Capacity</th>
+                        <th>Thermal & Uphill Profile</th>
+                        <th>Mobility & Weather</th>
+                        <th>Support & MSRP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bike in fleet %}
+                    <tr>
+                        <td>
+                            <a href="{{ bike['Manufacturer_URL'] }}" target="_blank" class="model-link">{{ bike['Model'] }} ↗</a>
+                        </td>
+                        <td><span class="category-tag">{{ bike['Category'] }}</span></td>
+                        <td><strong>{{ bike['Voltage'] }}V System</strong><span class="spec-sub">{{ bike['Peak_Watts'] }}W Peak Output</span></td>
+                        <td><strong>{{ bike['Torque_Nm'] }} Nm</strong><span class="spec-sub">{{ bike['Battery_Wh'] }} Wh Pack</span></td>
+                        <td><strong>{{ bike['Cooling'] }}</strong><span class="spec-sub">{{ bike['Uphill_Climbing_Limit'] }}</span></td>
+                        <td>{{ bike['Tire_Spec'] }}<span class="spec-sub">{{ bike['Waterproofing'] }}</span></td>
+                        <td><span class="spec-sub">{{ bike['Support_QC_Rating'] }}</span><span class="price-tag">${{ bike['Price'] }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        Best 60 Volt E-Bike Matrix &nbsp;|&nbsp; Updated: <span>November 2026</span>
+    </footer>
+
+    <script>
+        function filterTable() {
+            let input = document.getElementById('searchInput');
+            let filter = input.value.toLowerCase();
+            let table = document.getElementById('comparisonTable');
+            let tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let rowText = tr[i].textContent || tr[i].innerText;
+                if (rowText.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
